@@ -1,0 +1,90 @@
+# module "eks" {
+#   source  = "terraform-aws-modules/eks/aws"
+#   version = "~> 20.0"
+
+#   cluster_name    = "${var.name}-cluster"
+#   cluster_version = var.cluster-version
+
+#   cluster_endpoint_public_access  = true
+
+#   cluster_addons = {
+#     coredns                = {}
+#     eks-pod-identity-agent = {}
+#     kube-proxy             = {}
+#     vpc-cni                = {}
+#   }
+
+#   vpc_id                   = var.vpc-id
+#   subnet_ids               = var.subnet-ids # ["subnet-abcde012", "subnet-bcde012a", "subnet-fghi345a"]
+#   control_plane_subnet_ids = var.subnet-ids # ["subnet-xyzde987", "subnet-slkjf456", "subnet-qeiru789"]
+
+#   # EKS Managed Node Group(s)
+#   eks_managed_node_group_defaults = {
+#     instance_types = ["t2.micro"] # String mandatory["m6i.large", "m5.large", "m5n.large", "m5zn.large"]
+#   }
+
+#   eks_managed_node_groups = {
+#     example = {
+#       # Starting on 1.30, AL2023 is the default AMI type for EKS managed node groups
+#       ami_type       = "AL2023_x86_64_STANDARD" #"Ubuntu Server 22.04 LTS (HVM), SSD Volume Type"  
+#       instance_types = ["t2.micro"]
+
+#       min_size     = 1
+#       max_size     = 1
+#       desired_size = 1
+#     }
+#   }
+
+#   # Cluster access entry
+#   # To add the current caller identity as an administrator
+#   enable_cluster_creator_admin_permissions = true
+
+#   access_entries = {
+#     # One access entry with a policy associated
+#     example = {
+#       kubernetes_groups = []
+#       principal_arn     = "${aws_iam_role.eks_admin_role.arn}"
+
+#       policy_associations = {
+#         example = {
+#           policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSViewPolicy"
+#           access_scope = {
+#             namespaces = ["default"]
+#             type       = "namespace"
+#           }
+#         }
+#       }
+#     }
+#   }
+
+#   tags = {
+#     Environment = "dev"
+#     Terraform   = "true"
+#   }
+# }
+
+
+# # iam role for eks ----------------------------------------------------------
+# resource "aws_iam_role" "eks_admin_role" {
+#   name = "eks_admin_role"
+
+#   assume_role_policy = jsonencode({
+#     Version = "2012-10-17",
+#     Statement = [
+#       {
+#         Effect = "Allow",
+#         Principal = {
+#           Service = "eks.amazonaws.com"
+#         },
+#         Action = "sts:AssumeRole"
+#       }
+#     ]
+#   })
+# }
+
+# resource "aws_iam_role_policy_attachment" "admin_policy_attachment" {
+#   role       = aws_iam_role.eks_admin_role.name
+#   policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
+# }
+
+# #-----------------------
